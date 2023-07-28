@@ -32,6 +32,9 @@ public class TravelCostService {
         if (isIncomplete(currentTap, nextTap)) {
             return calculateCostForIncompleteTrip(currentTap);
         }
+        if (isCancelled(currentTap, nextTap)) {
+            return calculateCostForCancelledTrip(currentTap, nextTap);
+        }
 
         return calculateCostForCompletedTrip(currentTap, nextTap);
     }
@@ -45,7 +48,7 @@ public class TravelCostService {
         return new TripResult(
                 currentTap.getDateTimeUTC(),
                 nextTap.getDateTimeUTC(),
-                nextTap.getDateTimeUTC().toEpochSecond() - currentTap.getDateTimeUTC().toEpochSecond(),
+                getElapsedTime(currentTap, nextTap),
                 currentTap.getStopId(),
                 nextTap.getStopId(),
                 chargeAmount,
@@ -75,8 +78,27 @@ public class TravelCostService {
         );
     }
 
+    private TripResult calculateCostForCancelledTrip(TapDetail currentTap, TapDetail nextTap) {
+        return new TripResult(
+                currentTap.getDateTimeUTC(),
+                nextTap.getDateTimeUTC(),
+                getElapsedTime(currentTap, nextTap),
+                currentTap.getStopId(),
+                nextTap.getStopId(),
+                BigDecimal.ZERO,
+                currentTap.getCompanyId(),
+                currentTap.getBusId(),
+                currentTap.getPan(),
+                TripStatus.CANCELLED
+        );
+    }
+
     boolean isIncomplete(TapDetail currentTap, TapDetail nextTap) {
         return nextTap == null || (currentTap.getTapType() == TapType.ON && currentTap.getTapType() == nextTap.getTapType());
+    }
+
+    boolean isCancelled(TapDetail currentTap, TapDetail nextTap) {
+        return currentTap.getTapType() == TapType.ON && nextTap.getTapType() == TapType.OFF && currentTap.getStopId() == nextTap.getStopId();
     }
 
     TravelPrice getMaxCostForStop(StopId stopId) {
@@ -85,6 +107,10 @@ public class TravelCostService {
                 .max(Map.Entry.comparingByValue())
                 .map(entry -> new TravelPrice(entry.getKey(), entry.getValue()))
                 .orElseThrow();
+    }
+
+    private long getElapsedTime(TapDetail currentTap, TapDetail nextTap) {
+        return nextTap.getDateTimeUTC().toEpochSecond() - currentTap.getDateTimeUTC().toEpochSecond();
     }
 
     private static StopId[] convertStopsToArray(Set<StopId> stopSet) {

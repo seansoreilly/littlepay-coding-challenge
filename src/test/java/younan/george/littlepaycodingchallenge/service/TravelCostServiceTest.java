@@ -163,6 +163,29 @@ public class TravelCostServiceTest {
     }
 
     @Test
+    void shouldIdentifyCancelledTrip() {
+        TapDetail firstTap = new TapDetail(4, ZonedDateTime.parse("23-01-2023 08:00:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "4111111111111111");
+        TapDetail secondTap = new TapDetail(5, ZonedDateTime.parse("23-01-2023 08:02:00", formatter), TapType.OFF, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "4111111111111111");
+
+        TripResult expectedResult = new TripResult(
+                firstTap.getDateTimeUTC(),
+                secondTap.getDateTimeUTC(),
+                120,
+                StopId.STOP_1,
+                StopId.STOP_1,
+                BigDecimal.ZERO,
+                CompanyId.COMPANY_1,
+                BusId.BUS_37,
+                "4111111111111111",
+                TripStatus.CANCELLED
+        );
+
+        TripResult tripResult = travelCostService.calculateCost(tapExamples.get(3), tapExamples.get(4));
+
+        assertThat(tripResult, equalTo(expectedResult));
+    }
+
+    @Test
     void shouldIdentifyMaxCostForStops() {
         assertThat(travelCostService.getMaxCostForStop(StopId.STOP_1), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_1, StopId.STOP_3), COST_BETWEEN_1_AND_3)));
         assertThat(travelCostService.getMaxCostForStop(StopId.STOP_2), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_2, StopId.STOP_3), COST_BETWEEN_2_AND_3)));
