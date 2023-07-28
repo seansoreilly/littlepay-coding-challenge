@@ -27,6 +27,17 @@ public class TravelCostService {
         travelPrices.put(new TravelPriceId(StopId.STOP1, StopId.STOP3), new BigDecimal("7.30"));
     }
 
+    public List<TripResult> calculateCostForAll(List<TapDetail> tapDetails) {
+        int lastIndex = tapDetails.size() - 1;
+
+        return IntStream.range(0, lastIndex)
+                .mapToObj(index ->
+                        calculateCost(
+                                tapDetails.get(index),
+                                index < lastIndex ? tapDetails.get(index + 1) : null))
+                .toList();
+    }
+
     public TripResult calculateCost(TapDetail currentTap, TapDetail nextTap) {
         if (currentTap == null) {
             throw new IllegalArgumentException("currentTap must be non null!");

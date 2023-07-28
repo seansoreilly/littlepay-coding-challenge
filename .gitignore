@@ -1,9 +1,10 @@
 # Compiled class file
 *.class
 
-# Build & project folder
+# Build & project folder/items
 .idea/
 target/
+output.csv
 
 # Log file
 *.log

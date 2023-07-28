@@ -5,7 +5,9 @@ import younan.george.littlepaycodingchallenge.dto.TapDetail;
 import younan.george.littlepaycodingchallenge.dto.TravelPrice;
 import younan.george.littlepaycodingchallenge.dto.TravelPriceId;
 import younan.george.littlepaycodingchallenge.dto.TripResult;
-import younan.george.littlepaycodingchallenge.enums.*;
+import younan.george.littlepaycodingchallenge.enums.StopId;
+import younan.george.littlepaycodingchallenge.enums.TapType;
+import younan.george.littlepaycodingchallenge.enums.TripStatus;
 
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
