@@ -1,8 +1,6 @@
 package younan.george.littlepaycodingchallenge.dto;
 
 import lombok.Value;
-import younan.george.littlepaycodingchallenge.enums.BusId;
-import younan.george.littlepaycodingchallenge.enums.CompanyId;
 import younan.george.littlepaycodingchallenge.enums.StopId;
 import younan.george.littlepaycodingchallenge.enums.TripStatus;
 
@@ -17,8 +15,8 @@ public class TripResult {
     private StopId fromStopId;
     private StopId toStopId;
     private BigDecimal chargeAmount;
-    private CompanyId companyId;
-    private BusId busID;
+    private String companyId;
+    private String busID;
     private String pan;
     private TripStatus status;
 }

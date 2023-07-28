@@ -26,24 +26,24 @@ public class TravelCostServiceTest {
 
     // matching the examples provided in the instructions
     List<TapDetail> tapExamples = Arrays.asList(
-            new TapDetail(1, ZonedDateTime.parse("22-01-2023 13:00:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559"),
-            new TapDetail(2, ZonedDateTime.parse("22-01-2023 13:05:00", formatter), TapType.OFF, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559"),
-            new TapDetail(3, ZonedDateTime.parse("22-01-2023 09:20:00", formatter), TapType.ON, StopId.STOP_3, CompanyId.COMPANY_1, BusId.BUS_36, "4111111111111111"),
-            new TapDetail(4, ZonedDateTime.parse("23-01-2023 08:00:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "4111111111111111"),
-            new TapDetail(5, ZonedDateTime.parse("23-01-2023 08:02:00", formatter), TapType.OFF, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "4111111111111111"),
-            new TapDetail(6, ZonedDateTime.parse("24-01-2023 16:30:00", formatter), TapType.OFF, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559")
+            new TapDetail(1, ZonedDateTime.parse("22-01-2023 13:00:00", formatter), TapType.ON, StopId.STOP1, "Company1", "Bus37", "5500005555555559"),
+            new TapDetail(2, ZonedDateTime.parse("22-01-2023 13:05:00", formatter), TapType.OFF, StopId.STOP2, "Company1", "Bus37", "5500005555555559"),
+            new TapDetail(3, ZonedDateTime.parse("22-01-2023 09:20:00", formatter), TapType.ON, StopId.STOP3, "Company1", "Bus36", "4111111111111111"),
+            new TapDetail(4, ZonedDateTime.parse("23-01-2023 08:00:00", formatter), TapType.ON, StopId.STOP1, "Company1", "Bus37", "4111111111111111"),
+            new TapDetail(5, ZonedDateTime.parse("23-01-2023 08:02:00", formatter), TapType.OFF, StopId.STOP1, "Company1", "Bus37", "4111111111111111"),
+            new TapDetail(6, ZonedDateTime.parse("24-01-2023 16:30:00", formatter), TapType.OFF, StopId.STOP2, "Company1", "Bus37", "5500005555555559")
     );
 
     @Test
     void shouldIdentifyCompletedTrip_Stop1ToStop2() {
-        TapDetail firstTap = new TapDetail(1, ZonedDateTime.parse("22-01-2023 13:00:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559");
-        TapDetail secondTap = new TapDetail(2, ZonedDateTime.parse("22-01-2023 13:05:00", formatter), TapType.OFF, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559");
+        TapDetail firstTap = new TapDetail(1, ZonedDateTime.parse("22-01-2023 13:00:00", formatter), TapType.ON, StopId.STOP1, "Company1", "Bus37", "5500005555555559");
+        TapDetail secondTap = new TapDetail(2, ZonedDateTime.parse("22-01-2023 13:05:00", formatter), TapType.OFF, StopId.STOP2, "Company1", "Bus37", "5500005555555559");
         TripResult expectedResult = new TripResult(
                 firstTap.getDateTimeUTC(),
                 secondTap.getDateTimeUTC(),
                 300,
-                StopId.STOP_1,
-                StopId.STOP_2,
+                StopId.STOP1,
+                StopId.STOP2,
                 COST_BETWEEN_1_AND_2,
                 firstTap.getCompanyId(),
                 firstTap.getBusId(),
@@ -58,14 +58,14 @@ public class TravelCostServiceTest {
 
     @Test
     void shouldIdentifyCompletedTrip_Stop1ToStop3() {
-        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
-        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("25-01-2023 12:59:59", formatter), TapType.OFF, StopId.STOP_3, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP1, "Company1", "Bus36", "5500005555555559");
+        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("25-01-2023 12:59:59", formatter), TapType.OFF, StopId.STOP3, "Company1", "Bus36", "5500005555555559");
         TripResult expectedResult = new TripResult(
                 firstTap.getDateTimeUTC(),
                 secondTap.getDateTimeUTC(),
                 1799,
-                StopId.STOP_1,
-                StopId.STOP_3,
+                StopId.STOP1,
+                StopId.STOP3,
                 COST_BETWEEN_1_AND_3,
                 firstTap.getCompanyId(),
                 firstTap.getBusId(),
@@ -80,14 +80,14 @@ public class TravelCostServiceTest {
 
     @Test
     void shouldIdentifyCompletedTrip_Stop2ToStop3() {
-        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
-        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("26-01-2023 12:30:01", formatter), TapType.OFF, StopId.STOP_3, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP2, "Company1", "Bus36", "5500005555555559");
+        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("26-01-2023 12:30:01", formatter), TapType.OFF, StopId.STOP3, "Company1", "Bus36", "5500005555555559");
         TripResult expectedResult = new TripResult(
                 firstTap.getDateTimeUTC(),
                 secondTap.getDateTimeUTC(),
                 86401,
-                StopId.STOP_2,
-                StopId.STOP_3,
+                StopId.STOP2,
+                StopId.STOP3,
                 COST_BETWEEN_2_AND_3,
                 firstTap.getCompanyId(),
                 firstTap.getBusId(),
@@ -102,14 +102,14 @@ public class TravelCostServiceTest {
 
     @Test
     void shouldIdentifyCompletedTrip_Stop3ToStop2() {
-        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP_3, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
-        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("26-01-2023 12:30:01", formatter), TapType.OFF, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP3, "Company1", "Bus36", "5500005555555559");
+        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("26-01-2023 12:30:01", formatter), TapType.OFF, StopId.STOP2, "Company1", "Bus36", "5500005555555559");
         TripResult expectedResult = new TripResult(
                 firstTap.getDateTimeUTC(),
                 secondTap.getDateTimeUTC(),
                 86401,
-                StopId.STOP_3,
-                StopId.STOP_2,
+                StopId.STOP3,
+                StopId.STOP2,
                 COST_BETWEEN_2_AND_3,
                 firstTap.getCompanyId(),
                 firstTap.getBusId(),
@@ -128,11 +128,11 @@ public class TravelCostServiceTest {
                 ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
                 ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
                 0,
-                StopId.STOP_3,
-                StopId.STOP_1,
+                StopId.STOP3,
+                StopId.STOP1,
                 COST_BETWEEN_1_AND_3,
-                CompanyId.COMPANY_1,
-                BusId.BUS_36,
+                "Company1",
+                "Bus36",
                 "4111111111111111",
                 TripStatus.INCOMPLETE
         );
@@ -148,11 +148,11 @@ public class TravelCostServiceTest {
                 ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
                 ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
                 0,
-                StopId.STOP_3,
-                StopId.STOP_1,
+                StopId.STOP3,
+                StopId.STOP1,
                 COST_BETWEEN_1_AND_3,
-                CompanyId.COMPANY_1,
-                BusId.BUS_36,
+                "Company1",
+                "Bus36",
                 "4111111111111111",
                 TripStatus.INCOMPLETE
         );
@@ -164,18 +164,18 @@ public class TravelCostServiceTest {
 
     @Test
     void shouldIdentifyCancelledTrip() {
-        TapDetail firstTap = new TapDetail(4, ZonedDateTime.parse("23-01-2023 08:00:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "4111111111111111");
-        TapDetail secondTap = new TapDetail(5, ZonedDateTime.parse("23-01-2023 08:02:00", formatter), TapType.OFF, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "4111111111111111");
+        TapDetail firstTap = new TapDetail(4, ZonedDateTime.parse("23-01-2023 08:00:00", formatter), TapType.ON, StopId.STOP1, "Company1", "Bus37", "4111111111111111");
+        TapDetail secondTap = new TapDetail(5, ZonedDateTime.parse("23-01-2023 08:02:00", formatter), TapType.OFF, StopId.STOP1, "Company1", "Bus37", "4111111111111111");
 
         TripResult expectedResult = new TripResult(
                 firstTap.getDateTimeUTC(),
                 secondTap.getDateTimeUTC(),
                 120,
-                StopId.STOP_1,
-                StopId.STOP_1,
+                StopId.STOP1,
+                StopId.STOP1,
                 BigDecimal.ZERO,
-                CompanyId.COMPANY_1,
-                BusId.BUS_37,
+                "Company1",
+                "Bus37",
                 "4111111111111111",
                 TripStatus.CANCELLED
         );
@@ -187,14 +187,14 @@ public class TravelCostServiceTest {
 
     @Test
     void shouldIdentifyMaxCostForStops() {
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_1), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_1, StopId.STOP_3), COST_BETWEEN_1_AND_3)));
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_2), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_2, StopId.STOP_3), COST_BETWEEN_2_AND_3)));
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_3), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_1, StopId.STOP_3), COST_BETWEEN_1_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP1), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP1, StopId.STOP3), COST_BETWEEN_1_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP2), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP2, StopId.STOP3), COST_BETWEEN_2_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP3), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP1, StopId.STOP3), COST_BETWEEN_1_AND_3)));
 
         // reverse direction
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_1), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_3, StopId.STOP_1), COST_BETWEEN_1_AND_3)));
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_2), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_3, StopId.STOP_2), COST_BETWEEN_2_AND_3)));
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_3), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_3, StopId.STOP_1), COST_BETWEEN_1_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP1), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP3, StopId.STOP1), COST_BETWEEN_1_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP2), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP3, StopId.STOP2), COST_BETWEEN_2_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP3), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP3, StopId.STOP1), COST_BETWEEN_1_AND_3)));
     }
 
 }

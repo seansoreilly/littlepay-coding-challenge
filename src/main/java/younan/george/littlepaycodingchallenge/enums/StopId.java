@@ -1,7 +1,7 @@
 package younan.george.littlepaycodingchallenge.enums;
 
 public enum StopId {
-    STOP_1("stop1"), STOP_2("stop2"), STOP_3("stop3");
+    STOP1("Stop1"), STOP2("Stop2"), STOP3("Stop3");
 
     private final String id;
 

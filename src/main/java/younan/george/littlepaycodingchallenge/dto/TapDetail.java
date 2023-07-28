@@ -1,8 +1,6 @@
 package younan.george.littlepaycodingchallenge.dto;
 
 import lombok.Value;
-import younan.george.littlepaycodingchallenge.enums.BusId;
-import younan.george.littlepaycodingchallenge.enums.CompanyId;
 import younan.george.littlepaycodingchallenge.enums.StopId;
 import younan.george.littlepaycodingchallenge.enums.TapType;
 
@@ -14,8 +12,8 @@ public class TapDetail {
     private ZonedDateTime dateTimeUTC;
     private TapType tapType;
     private StopId stopId;
-    private CompanyId companyId;
-    private BusId busId;
+    private String companyId;
+    private String busId;
     private String pan;
 }
 

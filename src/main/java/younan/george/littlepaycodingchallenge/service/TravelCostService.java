@@ -11,8 +11,10 @@ import younan.george.littlepaycodingchallenge.enums.TripStatus;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 @Service
 public class TravelCostService {
@@ -20,9 +22,9 @@ public class TravelCostService {
 
     public TravelCostService() {
         travelPrices = new HashMap<>();
-        travelPrices.put(new TravelPriceId(StopId.STOP_1, StopId.STOP_2), new BigDecimal("3.25"));
-        travelPrices.put(new TravelPriceId(StopId.STOP_2, StopId.STOP_3), new BigDecimal("5.50"));
-        travelPrices.put(new TravelPriceId(StopId.STOP_1, StopId.STOP_3), new BigDecimal("7.30"));
+        travelPrices.put(new TravelPriceId(StopId.STOP1, StopId.STOP2), new BigDecimal("3.25"));
+        travelPrices.put(new TravelPriceId(StopId.STOP2, StopId.STOP3), new BigDecimal("5.50"));
+        travelPrices.put(new TravelPriceId(StopId.STOP1, StopId.STOP3), new BigDecimal("7.30"));
     }
 
     public TripResult calculateCost(TapDetail currentTap, TapDetail nextTap) {
