@@ -1,9 +1,8 @@
 package younan.george.littlepaycodingchallenge.service;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import younan.george.littlepaycodingchallenge.dto.TapDetail;
+import younan.george.littlepaycodingchallenge.dto.TravelPrice;
 import younan.george.littlepaycodingchallenge.dto.TripResult;
 import younan.george.littlepaycodingchallenge.enums.*;
 
@@ -13,6 +12,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TravelCostServiceTest {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").withZone(ZoneOffset.UTC);
@@ -44,7 +46,54 @@ public class TravelCostServiceTest {
 
         TripResult tripResult = travelCostService.calculateCost(tapExamples.get(0), tapExamples.get(1));
 
-        MatcherAssert.assertThat(tripResult, CoreMatchers.equalTo(expectedResult));
+        assertThat(tripResult, equalTo(expectedResult));
+    }
+
+    @Test
+    void shouldIdentifyIncompleteTrip() {
+        TripResult expectedResult = new TripResult(
+                ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
+                ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
+                0,
+                StopId.STOP_3,
+                StopId.STOP_1,
+                new BigDecimal("7.30"),
+                CompanyId.COMPANY_1,
+                BusId.BUS_36,
+                "4111111111111111",
+                TripStatus.INCOMPLETE
+        );
+
+        TripResult tripResult = travelCostService.calculateCost(tapExamples.get(2), tapExamples.get(3));
+
+        assertThat(tripResult, equalTo(expectedResult));
+    }
+
+    @Test
+    void shouldIdentifyLastTapOnAsIncompleteTrip() {
+        TripResult expectedResult = new TripResult(
+                ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
+                ZonedDateTime.parse("22-01-2023 09:20:00", formatter),
+                0,
+                StopId.STOP_3,
+                StopId.STOP_1,
+                new BigDecimal("7.30"),
+                CompanyId.COMPANY_1,
+                BusId.BUS_36,
+                "4111111111111111",
+                TripStatus.INCOMPLETE
+        );
+
+        TripResult tripResult = travelCostService.calculateCost(tapExamples.get(2), null);
+
+        assertThat(tripResult, equalTo(expectedResult));
+    }
+
+    @Test
+    void shouldIdentifyMaxCostForStops() {
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_1), equalTo(new TravelPrice(StopId.STOP_1, StopId.STOP_3, new BigDecimal("7.30"))));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_2), equalTo(new TravelPrice(StopId.STOP_2, StopId.STOP_3, new BigDecimal("5.50"))));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_3), equalTo(new TravelPrice(StopId.STOP_1, StopId.STOP_3, new BigDecimal("7.30"))));
     }
 
 }
