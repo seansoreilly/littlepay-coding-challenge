@@ -3,6 +3,7 @@ package younan.george.littlepaycodingchallenge.service;
 import org.junit.jupiter.api.Test;
 import younan.george.littlepaycodingchallenge.dto.TapDetail;
 import younan.george.littlepaycodingchallenge.dto.TravelPrice;
+import younan.george.littlepaycodingchallenge.dto.TravelPriceId;
 import younan.george.littlepaycodingchallenge.dto.TripResult;
 import younan.george.littlepaycodingchallenge.enums.*;
 
@@ -17,9 +18,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TravelCostServiceTest {
+    public static final BigDecimal COST_BETWEEN_1_AND_2 = new BigDecimal("3.25");
+    public static final BigDecimal COST_BETWEEN_2_AND_3 = new BigDecimal("5.50");
+    public static final BigDecimal COST_BETWEEN_1_AND_3 = new BigDecimal("7.30");
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss").withZone(ZoneOffset.UTC);
     TravelCostService travelCostService = new TravelCostService();
 
+    // matching the examples provided in the instructions
     List<TapDetail> tapExamples = Arrays.asList(
             new TapDetail(1, ZonedDateTime.parse("22-01-2023 13:00:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559"),
             new TapDetail(2, ZonedDateTime.parse("22-01-2023 13:05:00", formatter), TapType.OFF, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559"),
@@ -30,21 +35,89 @@ public class TravelCostServiceTest {
     );
 
     @Test
-    void shouldIdentifyCompletedTripBetweenTaps() {
+    void shouldIdentifyCompletedTrip_Stop1ToStop2() {
+        TapDetail firstTap = new TapDetail(1, ZonedDateTime.parse("22-01-2023 13:00:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559");
+        TapDetail secondTap = new TapDetail(2, ZonedDateTime.parse("22-01-2023 13:05:00", formatter), TapType.OFF, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_37, "5500005555555559");
         TripResult expectedResult = new TripResult(
-                ZonedDateTime.parse("22-01-2023 13:00:00", formatter),
-                ZonedDateTime.parse("22-01-2023 13:05:00", formatter),
-                900,
+                firstTap.getDateTimeUTC(),
+                secondTap.getDateTimeUTC(),
+                300,
                 StopId.STOP_1,
                 StopId.STOP_2,
-                new BigDecimal("3.25"),
-                CompanyId.COMPANY_1,
-                BusId.BUS_37,
-                "5500005555555559",
+                COST_BETWEEN_1_AND_2,
+                firstTap.getCompanyId(),
+                firstTap.getBusId(),
+                firstTap.getPan(),
                 TripStatus.COMPLETED
         );
 
-        TripResult tripResult = travelCostService.calculateCost(tapExamples.get(0), tapExamples.get(1));
+        TripResult tripResult = travelCostService.calculateCost(firstTap, secondTap);
+
+        assertThat(tripResult, equalTo(expectedResult));
+    }
+
+    @Test
+    void shouldIdentifyCompletedTrip_Stop1ToStop3() {
+        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP_1, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("25-01-2023 12:59:59", formatter), TapType.OFF, StopId.STOP_3, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TripResult expectedResult = new TripResult(
+                firstTap.getDateTimeUTC(),
+                secondTap.getDateTimeUTC(),
+                1799,
+                StopId.STOP_1,
+                StopId.STOP_3,
+                COST_BETWEEN_1_AND_3,
+                firstTap.getCompanyId(),
+                firstTap.getBusId(),
+                firstTap.getPan(),
+                TripStatus.COMPLETED
+        );
+
+        TripResult tripResult = travelCostService.calculateCost(firstTap, secondTap);
+
+        assertThat(tripResult, equalTo(expectedResult));
+    }
+
+    @Test
+    void shouldIdentifyCompletedTrip_Stop2ToStop3() {
+        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("26-01-2023 12:30:01", formatter), TapType.OFF, StopId.STOP_3, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TripResult expectedResult = new TripResult(
+                firstTap.getDateTimeUTC(),
+                secondTap.getDateTimeUTC(),
+                86401,
+                StopId.STOP_2,
+                StopId.STOP_3,
+                COST_BETWEEN_2_AND_3,
+                firstTap.getCompanyId(),
+                firstTap.getBusId(),
+                firstTap.getPan(),
+                TripStatus.COMPLETED
+        );
+
+        TripResult tripResult = travelCostService.calculateCost(firstTap, secondTap);
+
+        assertThat(tripResult, equalTo(expectedResult));
+    }
+
+    @Test
+    void shouldIdentifyCompletedTrip_Stop3ToStop2() {
+        TapDetail firstTap = new TapDetail(7, ZonedDateTime.parse("25-01-2023 12:30:00", formatter), TapType.ON, StopId.STOP_3, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TapDetail secondTap = new TapDetail(8, ZonedDateTime.parse("26-01-2023 12:30:01", formatter), TapType.OFF, StopId.STOP_2, CompanyId.COMPANY_1, BusId.BUS_36, "5500005555555559");
+        TripResult expectedResult = new TripResult(
+                firstTap.getDateTimeUTC(),
+                secondTap.getDateTimeUTC(),
+                86401,
+                StopId.STOP_3,
+                StopId.STOP_2,
+                COST_BETWEEN_2_AND_3,
+                firstTap.getCompanyId(),
+                firstTap.getBusId(),
+                firstTap.getPan(),
+                TripStatus.COMPLETED
+        );
+
+        TripResult tripResult = travelCostService.calculateCost(firstTap, secondTap);
 
         assertThat(tripResult, equalTo(expectedResult));
     }
@@ -57,7 +130,7 @@ public class TravelCostServiceTest {
                 0,
                 StopId.STOP_3,
                 StopId.STOP_1,
-                new BigDecimal("7.30"),
+                COST_BETWEEN_1_AND_3,
                 CompanyId.COMPANY_1,
                 BusId.BUS_36,
                 "4111111111111111",
@@ -77,7 +150,7 @@ public class TravelCostServiceTest {
                 0,
                 StopId.STOP_3,
                 StopId.STOP_1,
-                new BigDecimal("7.30"),
+                COST_BETWEEN_1_AND_3,
                 CompanyId.COMPANY_1,
                 BusId.BUS_36,
                 "4111111111111111",
@@ -91,9 +164,14 @@ public class TravelCostServiceTest {
 
     @Test
     void shouldIdentifyMaxCostForStops() {
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_1), equalTo(new TravelPrice(StopId.STOP_1, StopId.STOP_3, new BigDecimal("7.30"))));
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_2), equalTo(new TravelPrice(StopId.STOP_2, StopId.STOP_3, new BigDecimal("5.50"))));
-        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_3), equalTo(new TravelPrice(StopId.STOP_1, StopId.STOP_3, new BigDecimal("7.30"))));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_1), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_1, StopId.STOP_3), COST_BETWEEN_1_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_2), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_2, StopId.STOP_3), COST_BETWEEN_2_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_3), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_1, StopId.STOP_3), COST_BETWEEN_1_AND_3)));
+
+        // reverse direction
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_1), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_3, StopId.STOP_1), COST_BETWEEN_1_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_2), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_3, StopId.STOP_2), COST_BETWEEN_2_AND_3)));
+        assertThat(travelCostService.getMaxCostForStop(StopId.STOP_3), equalTo(new TravelPrice(new TravelPriceId(StopId.STOP_3, StopId.STOP_1), COST_BETWEEN_1_AND_3)));
     }
 
 }

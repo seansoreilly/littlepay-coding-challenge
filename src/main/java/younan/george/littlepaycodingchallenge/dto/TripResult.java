@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 public class TripResult {
     private ZonedDateTime started;
     private ZonedDateTime finished;
-    private int durationSecs;
+    private long durationSecs;
     private StopId fromStopId;
     private StopId toStopId;
     private BigDecimal chargeAmount;

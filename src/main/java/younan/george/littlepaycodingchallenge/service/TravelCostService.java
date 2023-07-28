@@ -3,23 +3,26 @@ package younan.george.littlepaycodingchallenge.service;
 import org.springframework.stereotype.Service;
 import younan.george.littlepaycodingchallenge.dto.TapDetail;
 import younan.george.littlepaycodingchallenge.dto.TravelPrice;
+import younan.george.littlepaycodingchallenge.dto.TravelPriceId;
 import younan.george.littlepaycodingchallenge.dto.TripResult;
 import younan.george.littlepaycodingchallenge.enums.StopId;
 import younan.george.littlepaycodingchallenge.enums.TapType;
 import younan.george.littlepaycodingchallenge.enums.TripStatus;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class TravelCostService {
-    private HashSet<TravelPrice> travelPrices = new HashSet<>();
+    private HashMap<TravelPriceId, BigDecimal> travelPrices;
 
     public TravelCostService() {
-        travelPrices.add(new TravelPrice(StopId.STOP_1, StopId.STOP_2, new BigDecimal("3.25")));
-        travelPrices.add(new TravelPrice(StopId.STOP_2, StopId.STOP_3, new BigDecimal("5.50")));
-        travelPrices.add(new TravelPrice(StopId.STOP_1, StopId.STOP_3, new BigDecimal("7.30")));
+        travelPrices = new HashMap<>();
+        travelPrices.put(new TravelPriceId(StopId.STOP_1, StopId.STOP_2), new BigDecimal("3.25"));
+        travelPrices.put(new TravelPriceId(StopId.STOP_2, StopId.STOP_3), new BigDecimal("5.50"));
+        travelPrices.put(new TravelPriceId(StopId.STOP_1, StopId.STOP_3), new BigDecimal("7.30"));
     }
 
     public TripResult calculateCost(TapDetail currentTap, TapDetail nextTap) {
@@ -30,14 +33,22 @@ public class TravelCostService {
             return calculateCostForIncompleteTrip(currentTap);
         }
 
-        // TODO add tests and remove hardcoded data
+        return calculateCostForCompletedTrip(currentTap, nextTap);
+    }
+
+    private TripResult calculateCostForCompletedTrip(TapDetail currentTap, TapDetail nextTap) {
+        BigDecimal chargeAmount = travelPrices.get(new TravelPriceId(currentTap.getStopId(), nextTap.getStopId()));
+        if (chargeAmount == null) {
+            throw new IllegalArgumentException("Unknown travel cost between stops " + currentTap.getStopId() + ", " + nextTap.getStopId());
+        }
+
         return new TripResult(
                 currentTap.getDateTimeUTC(),
                 nextTap.getDateTimeUTC(),
-                900,
+                nextTap.getDateTimeUTC().toEpochSecond() - currentTap.getDateTimeUTC().toEpochSecond(),
                 currentTap.getStopId(),
                 nextTap.getStopId(),
-                new BigDecimal("3.25"),
+                chargeAmount,
                 currentTap.getCompanyId(),
                 currentTap.getBusId(),
                 currentTap.getPan(),
@@ -48,12 +59,14 @@ public class TravelCostService {
     private TripResult calculateCostForIncompleteTrip(TapDetail currentTap) {
         TravelPrice maxCostForStop = getMaxCostForStop(currentTap.getStopId());
 
+        StopId[] stops = convertStopsToArray(maxCostForStop.getTravelPriceId().getStops());
+        StopId nextStop = currentTap.getStopId() == stops[0] ? stops[1] : stops[0];
         return new TripResult(
                 currentTap.getDateTimeUTC(),
                 currentTap.getDateTimeUTC(),
                 0,
-                maxCostForStop.getStop1(),
-                maxCostForStop.getStop2(),
+                currentTap.getStopId(),
+                nextStop,
                 maxCostForStop.getCost(),
                 currentTap.getCompanyId(),
                 currentTap.getBusId(),
@@ -67,11 +80,17 @@ public class TravelCostService {
     }
 
     TravelPrice getMaxCostForStop(StopId stopId) {
-        TravelPrice result = travelPrices.stream()
-                .filter(travelPrice -> travelPrice.getStop1() == stopId || travelPrice.getStop2() == stopId)
-                .max(Comparator.comparing(TravelPrice::getCost))
+        return travelPrices.entrySet().stream()
+                .filter(travelPrice -> travelPrice.getKey().getStops().contains(stopId))
+                .max(Map.Entry.comparingByValue())
+                .map(entry -> new TravelPrice(entry.getKey(), entry.getValue()))
                 .orElseThrow();
-
-        return result.getStop1() == stopId ? result : result.reverseStops();
     }
+
+    private static StopId[] convertStopsToArray(Set<StopId> stopSet) {
+        StopId[] stops = new StopId[2];
+        stopSet.toArray(stops);
+        return stops;
+    }
+
 }
