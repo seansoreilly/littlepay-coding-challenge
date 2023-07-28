@@ -7,6 +7,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+// These tests might seem overkill since the equality is handled by Lombok.
+// I chose to keep them since it's vital that the direction of stops is ignored for equality checks, as we use this ID as a key when retrieving prices from a HashMap.
 class TravelPriceIdTest {
 
     @Test
