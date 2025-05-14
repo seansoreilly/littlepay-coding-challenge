@@ -19,10 +19,9 @@ class LittlepayCodingChallengeApplicationTests {
 	}
 
 	@Test
-	void shouldWriteToSysout() throws Exception {
+	void shouldWriteToOutputFile() throws Exception {
 		List<String> expectedCsvContent = Arrays.asList("Started, Finished, DurationSecs, FromStopId, ToStopId, ChargeAmount, CompanyId, BusID, PAN, Status",
 				"2023-01-22T13:00Z,2023-01-22T13:05Z,300,STOP1,STOP2,3.25,Company1,Bus37,COMPLETED",
-				"2023-01-22T13:05Z,2023-01-22T09:20Z,-13500,STOP2,STOP3,5.50,Company1,Bus37,COMPLETED",
 				"2023-01-22T09:20Z,2023-01-22T09:20Z,0,STOP3,STOP1,7.30,Company1,Bus36,INCOMPLETE",
 				"2023-01-23T08:00Z,2023-01-23T08:02Z,120,STOP1,STOP1,0,Company1,Bus37,CANCELLED",
 				"2023-01-23T08:02Z,2023-01-24T16:30Z,116880,STOP1,STOP2,3.25,Company1,Bus37,COMPLETED");
