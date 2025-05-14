@@ -8,6 +8,8 @@ import younan.george.littlepaycodingchallenge.dto.TripResult;
 import younan.george.littlepaycodingchallenge.enums.StopId;
 import younan.george.littlepaycodingchallenge.enums.TapType;
 import younan.george.littlepaycodingchallenge.enums.TripStatus;
+import younan.george.littlepaycodingchallenge.exception.InvalidTapException;
+import younan.george.littlepaycodingchallenge.exception.InvalidTripException;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -69,11 +71,12 @@ public class TravelCostService {
      * @param currentTap The current tap event
      * @param nextTap The next tap event, or null if there is no next tap
      * @return A TripResult containing the calculated cost and trip status
-     * @throws IllegalArgumentException if currentTap is null or if the travel cost between stops is unknown
+     * @throws InvalidTapException if currentTap is null
+     * @throws InvalidTripException if the travel cost between stops is unknown
      */
     public TripResult calculateCost(TapDetail currentTap, TapDetail nextTap) {
         if (currentTap == null) {
-            throw new IllegalArgumentException("currentTap must be non null!");
+            throw new younan.george.littlepaycodingchallenge.exception.InvalidTapException("currentTap must be non null!");
         }
         if (isIncomplete(currentTap, nextTap)) {
             return calculateCostForIncompleteTrip(currentTap);
@@ -92,12 +95,13 @@ public class TravelCostService {
      * @param currentTap The tap-on event
      * @param nextTap The tap-off event
      * @return A TripResult with the COMPLETED status and the appropriate charge
-     * @throws IllegalArgumentException if the travel cost between the stops is unknown
+     * @throws InvalidTripException if the travel cost between the stops is unknown
      */
     private TripResult calculateCostForCompletedTrip(TapDetail currentTap, TapDetail nextTap) {
         BigDecimal chargeAmount = travelPrices.get(new TravelPriceId(currentTap.getStopId(), nextTap.getStopId()));
         if (chargeAmount == null) {
-            throw new IllegalArgumentException("Unknown travel cost between stops " + currentTap.getStopId() + ", " + nextTap.getStopId());
+            throw new InvalidTripException("Unknown travel cost between stops " + currentTap.getStopId() + ", " + nextTap.getStopId(), 
+                currentTap, nextTap);
         }
 
         return new TripResult(

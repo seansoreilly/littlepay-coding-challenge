@@ -4,6 +4,10 @@ import lombok.NonNull;
 import lombok.Value;
 import younan.george.littlepaycodingchallenge.enums.StopId;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +24,9 @@ public class TravelPriceId {
      * This is an immutable set to prevent modification after creation.
      */
     @NonNull
+    @NotNull(message = "Stops set cannot be null")
+    @NotEmpty(message = "Stops set cannot be empty")
+    @Size(min = 2, max = 2, message = "Exactly two stops are required")
     private Set<StopId> stops;
 
     /**
